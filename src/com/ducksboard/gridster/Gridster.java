@@ -7,7 +7,10 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.EventListener;
+import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ResizeComposite;
 
@@ -17,13 +20,17 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 
 	private String id;
 
-	int counter;
+	Integer counter = 0;
 
 	private LayoutPanel divWrapper = new LayoutPanel();
 
 	private UnorderedListWidget ulWidget = new UnorderedListWidget();
 
 	private FlowPanel divWidget = new FlowPanel();
+
+	private DecoratedPopupPanel simplePopup = new DecoratedPopupPanel( true );
+
+	private IsWidget menuWidget;
 
 	public Gridster()
 	{
@@ -37,6 +44,8 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 		divWidget.addStyleName( "gridster" );
 		divWidget.add( ulWidget );
 		divWrapper.add( divWidget );
+		simplePopup.ensureDebugId( "cwBasicPopup-simplePopup" );
+		simplePopup.setWidth( "150px" );
 		initWidget( divWrapper );
 	}
 
@@ -82,8 +91,9 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 
 		$wnd.$(function() {
 			gridster = $wnd.$(".gridster ul").gridster({
-				widget_base_dimensions : [ 100, 55 ],
-				widget_margins : [ 5, 5 ],
+				widget_margins : [ 10, 10 ],
+				widget_base_dimensions : [ 140, 140 ],
+				min_cols : 6,
 				helper : 'clone',
 				resize : {
 					enabled : true
@@ -99,9 +109,9 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 		var gridster;
 		$wnd.$(function() {
 			gridster = $wnd.$(".gridster ul").gridster({
-			 	widget_margins: [10, 10],
-		        widget_base_dimensions: [140, 140],
-		        min_cols: 6,
+				widget_margins : [ 10, 10 ],
+				widget_base_dimensions : [ 200, 200 ],
+				min_cols : 6,
 				helper : 'clone',
 				resize : {
 					enabled : true
@@ -126,7 +136,6 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 			{
 				if ( Event.ONCLICK == event.getTypeInt() )
 				{
-					LogUtils.log( "This is event.", event );
 					Element target = event.getTarget();
 					String targetId = target.getId();
 					if ( targetId.contains( "delete" ) )
@@ -136,7 +145,7 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 				}
 			}
 		} );
-		Element addElem = DOM.getElementById( "img-add-" + idPrefix );
+		final Element addElem = DOM.getElementById( "img-add-" + idPrefix );
 		DOM.sinkEvents( addElem, Event.ONCLICK | Event.ONMOUSEOUT | Event.ONMOUSEOVER );
 		DOM.setEventListener( addElem, new EventListener()
 		{
@@ -144,12 +153,13 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 			{
 				if ( Event.ONCLICK == event.getTypeInt() )
 				{
-					LogUtils.log( "This is event.", event );
 					Element target = event.getTarget();
 					String targetId = target.getId();
 					if ( targetId.contains( "add" ) )
 					{
-
+						simplePopup.setWidget( menuWidget );
+						simplePopup.setPopupPosition( addElem.getAbsoluteLeft(), addElem.getAbsoluteTop() );
+						simplePopup.show();
 					}
 				}
 			}
@@ -162,32 +172,44 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 			{
 				if ( Event.ONCLICK == event.getTypeInt() )
 				{
-					LogUtils.log( "This is event.", event );
 					Element target = event.getTarget();
 					String targetId = target.getId();
 					if ( targetId.contains( "refresh" ) )
 					{
+						simplePopup.setWidget( new HTML( "You can invoke refresh on the Chart." ) );
+						simplePopup.setPopupPosition( addElem.getAbsoluteLeft(), addElem.getAbsoluteTop() );
+						simplePopup.show();
 					}
 				}
 			}
 		} );
+
+		simplePopup.hide();
+	}
+
+	public void setMenuWidget( IsWidget menuWidget )
+	{
+		this.menuWidget = menuWidget;
 	}
 
 	public native void addWidget( String id, String textContent )
 	/*-{
 		var gridster = this.@com.ducksboard.gridster.Gridster::jso;
-		var content = '<li id="li-' + id + '">';
-		content = content + '<span data-bind="text: text">' + textContent
-				+ '</span>';
+		var content = '';
+		content = content + '<li id="li-' + id + '">';
+		content = content + '<span style="float:right; display:block;">';
 		content = content
-				+ '<img src="images/icons/bullet_add.png" id="img-add-' + id
-				+ '" width="32" height="32"></img>';
+				+ '	<img src="images/icons/bullet_add.png" id="img-add-' + id
+				+ '" width="32" height="32">';
 		content = content
-				+ '<img src="images/icons/bullet_deny.png" id="img-delete-'
-				+ id + '" width="32" height="32"></img>';
+				+ '	<img src="images/icons/bullet_deny.png" id="img-delete-'
+				+ id + '" width="32" height="32">';
 		content = content
-				+ '<img src="images/icons/arrow_refresh.png" id="img-refresh-'
-				+ id + '" width="32" height="32"></img>';
+				+ '	<img src="images/icons/arrow_refresh.png" id="img-refresh-'
+				+ id + '" width="32" height="32">';
+		content = content + '</span>';
+		content = content + '<span style="clear: both;display: block;">'
+				+ textContent + '</span>';
 		content = content + '</li>';
 		gridster.add_widget(content);
 	}-*/;
@@ -208,4 +230,9 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 			console.log('Removing Done.');
 		});
 	}-*/;
+
+	public String getCounter()
+	{
+		return counter.toString();
+	}
 }

@@ -3,6 +3,8 @@ package com.appbootup.explore.gwt.client;
 import com.ducksboard.gridster.Gridster;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
@@ -19,14 +21,12 @@ import com.google.gwt.user.client.ui.VerticalPanel;
  */
 public class GWTGridster implements EntryPoint
 {
-	private final GreetingServiceAsync greetingService = GWT
-			.create( GreetingService.class );
+	private final GreetingServiceAsync greetingService = GWT.create( GreetingService.class );
 
 	public void onModuleLoad()
 	{
 		SplitLayoutPanel splitLayoutPanelDashboard = new SplitLayoutPanel( 5 );
-		splitLayoutPanelDashboard.getElement().getStyle()
-				.setProperty( "border", "3px solid #e7e7e7" );
+		splitLayoutPanelDashboard.getElement().getStyle().setProperty( "border", "3px solid #e7e7e7" );
 
 		VerticalPanel vPanelPalette = new VerticalPanel();
 		vPanelPalette.add( new Label( "Palette" ) );
@@ -45,17 +45,20 @@ public class GWTGridster implements EntryPoint
 
 		Button btnAdd = new Button( "Add" );
 		FlowPanel btnWrapper = new FlowPanel();
-
+		btnWrapper.setWidth( "100%" );
+		btnAdd.setWidth( "100%" );
 		btnWrapper.add( btnAdd );
-		vPanelPalette.add( btnWrapper );
+		//vPanelPalette.add( btnWrapper );
 
 		ScrollPanel sPanelPalette = new ScrollPanel();
 		sPanelPalette.setHeight( "100%" );
-		sPanelPalette.add( vPanelPalette );
+		sPanelPalette.setWidth( "100%" );
+		sPanelPalette.add( btnWrapper );
 
 		ScrollPanel sPanelCanvas = new ScrollPanel();
 		sPanelCanvas.setHeight( "100%" );
 		final Gridster gridster = new Gridster();
+		gridster.setMenuWidget( vPanelPalette );
 
 		splitLayoutPanelDashboard.addNorth( new Label( "Title" ), 50 );
 		splitLayoutPanelDashboard.addSouth( new Label( "Footer" ), 50 );
@@ -64,13 +67,21 @@ public class GWTGridster implements EntryPoint
 		splitLayoutPanelDashboard.addSouth( new Label( "Subfooter" ), 50 );
 		splitLayoutPanelDashboard.add( gridster );
 
+		lBoxCharts.addChangeHandler( new ChangeHandler()
+		{
+			@Override
+			public void onChange( ChangeEvent event )
+			{
+				String selectedItemText = lBoxCharts.getSelectedItemText();
+				gridster.addWidget( selectedItemText );
+			}
+		} );
 		btnAdd.addClickHandler( new ClickHandler()
 		{
 			@Override
 			public void onClick( ClickEvent event )
 			{
-				String selectedItemText = lBoxCharts.getSelectedItemText();
-				gridster.addWidget( selectedItemText );
+				gridster.addWidget( gridster.getCounter() );
 			}
 		} );
 
