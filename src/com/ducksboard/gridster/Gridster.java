@@ -7,9 +7,7 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.EventListener;
-import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ResizeComposite;
@@ -28,8 +26,6 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 
 	private FlowPanel divWidget = new FlowPanel();
 
-	private DecoratedPopupPanel simplePopup = new DecoratedPopupPanel( true );
-
 	private IsWidget menuWidget;
 
 	public Gridster()
@@ -44,8 +40,6 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 		divWidget.addStyleName( "gridster" );
 		divWidget.add( ulWidget );
 		divWrapper.add( divWidget );
-		simplePopup.ensureDebugId( "cwBasicPopup-simplePopup" );
-		simplePopup.setWidth( "150px" );
 		initWidget( divWrapper );
 	}
 
@@ -157,10 +151,7 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 					String targetId = target.getId();
 					if ( targetId.contains( "add" ) )
 					{
-						simplePopup.setWidget( menuWidget );
-						simplePopup.setPopupPosition( addElem.getAbsoluteLeft(), addElem
-								.getAbsoluteTop() );
-						simplePopup.show();
+						onMenuClick( targetId, "container-" + idSuffix );
 					}
 				}
 			}
@@ -177,18 +168,12 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 					String targetId = target.getId();
 					if ( targetId.contains( "refresh" ) )
 					{
-						simplePopup
-								.setWidget( new HTML( "You can invoke refresh on the Chart." ) );
-						simplePopup
-								.setPopupPosition( addElem.getAbsoluteLeft(), addElem
-										.getAbsoluteTop() );
-						simplePopup.show();
+						onMenuClick( targetId, "container-" + idSuffix );
 					}
 				}
 			}
 		} );
 
-		simplePopup.hide();
 		return "container-" + idSuffix;
 	}
 
@@ -242,5 +227,9 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 	public String getCounter()
 	{
 		return counter.toString();
+	}
+
+	protected void onMenuClick( final String targetId, final String containerId )
+	{
 	}
 }

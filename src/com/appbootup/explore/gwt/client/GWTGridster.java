@@ -1,13 +1,14 @@
 package com.appbootup.explore.gwt.client;
 
+import com.amcharts.impl.wrapper.IsReadyCallback;
+import com.appbootup.explore.gwt.client.misc.PolarChart;
 import com.ducksboard.gridster.Gridster;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -25,6 +26,10 @@ public class GWTGridster implements EntryPoint
 
 	public void onModuleLoad()
 	{
+		DecoratedPopupPanel simplePopup = new DecoratedPopupPanel( true );
+		simplePopup.ensureDebugId( "cwBasicPopup-simplePopup" );
+		simplePopup.setWidth( "150px" );
+
 		SplitLayoutPanel splitLayoutPanelDashboard = new SplitLayoutPanel( 5 );
 		splitLayoutPanelDashboard.getElement().getStyle().setProperty( "border", "3px solid #e7e7e7" );
 
@@ -57,7 +62,22 @@ public class GWTGridster implements EntryPoint
 
 		ScrollPanel sPanelCanvas = new ScrollPanel();
 		sPanelCanvas.setHeight( "100%" );
-		final Gridster gridster = new Gridster();
+		final Gridster gridster = new Gridster()
+		{
+			@Override
+			protected void onMenuClick( String targetId, final String containerId )
+			{
+				final PolarChart chart = new PolarChart();
+				chart.setReadyCallback( new IsReadyCallback()
+				{
+					@Override
+					public void onReady()
+					{
+						chart.getAmChart().write( containerId );
+					}
+				} );
+			}
+		};
 		gridster.setMenuWidget( vPanelPalette );
 
 		splitLayoutPanelDashboard.addNorth( new Label( "Title" ), 50 );
@@ -67,15 +87,6 @@ public class GWTGridster implements EntryPoint
 		splitLayoutPanelDashboard.addSouth( new Label( "Subfooter" ), 50 );
 		splitLayoutPanelDashboard.add( gridster );
 
-		lBoxCharts.addChangeHandler( new ChangeHandler()
-		{
-			@Override
-			public void onChange( ChangeEvent event )
-			{
-				String selectedItemText = lBoxCharts.getSelectedItemText();
-				gridster.addWidget( selectedItemText );
-			}
-		} );
 		btnAdd.addClickHandler( new ClickHandler()
 		{
 			@Override
