@@ -123,12 +123,12 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 		return gridster;
 	}-*/;
 
-	public void addWidget( String textContent )
+	public String addWidget( String textContent )
 	{
 		counter++;
-		final String idPrefix = id + "-" + counter;
-		addWidget( idPrefix, textContent );
-		Element deleteElem = DOM.getElementById( "img-delete-" + idPrefix );
+		final String idSuffix = id + "-" + counter;
+		addWidget( idSuffix, textContent );
+		Element deleteElem = DOM.getElementById( "img-delete-" + idSuffix );
 		DOM.sinkEvents( deleteElem, Event.ONCLICK | Event.ONMOUSEOUT | Event.ONMOUSEOVER );
 		DOM.setEventListener( deleteElem, new EventListener()
 		{
@@ -140,12 +140,12 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 					String targetId = target.getId();
 					if ( targetId.contains( "delete" ) )
 					{
-						removeWidgetById( "li-" + idPrefix );
+						removeWidgetById( "li-" + idSuffix );
 					}
 				}
 			}
 		} );
-		final Element addElem = DOM.getElementById( "img-add-" + idPrefix );
+		final Element addElem = DOM.getElementById( "img-add-" + idSuffix );
 		DOM.sinkEvents( addElem, Event.ONCLICK | Event.ONMOUSEOUT | Event.ONMOUSEOVER );
 		DOM.setEventListener( addElem, new EventListener()
 		{
@@ -158,13 +158,14 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 					if ( targetId.contains( "add" ) )
 					{
 						simplePopup.setWidget( menuWidget );
-						simplePopup.setPopupPosition( addElem.getAbsoluteLeft(), addElem.getAbsoluteTop() );
+						simplePopup.setPopupPosition( addElem.getAbsoluteLeft(), addElem
+								.getAbsoluteTop() );
 						simplePopup.show();
 					}
 				}
 			}
 		} );
-		Element refreshElem = DOM.getElementById( "img-refresh-" + idPrefix );
+		Element refreshElem = DOM.getElementById( "img-refresh-" + idSuffix );
 		DOM.sinkEvents( refreshElem, Event.ONCLICK | Event.ONMOUSEOUT | Event.ONMOUSEOVER );
 		DOM.setEventListener( refreshElem, new EventListener()
 		{
@@ -176,8 +177,11 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 					String targetId = target.getId();
 					if ( targetId.contains( "refresh" ) )
 					{
-						simplePopup.setWidget( new HTML( "You can invoke refresh on the Chart." ) );
-						simplePopup.setPopupPosition( addElem.getAbsoluteLeft(), addElem.getAbsoluteTop() );
+						simplePopup
+								.setWidget( new HTML( "You can invoke refresh on the Chart." ) );
+						simplePopup
+								.setPopupPosition( addElem.getAbsoluteLeft(), addElem
+										.getAbsoluteTop() );
 						simplePopup.show();
 					}
 				}
@@ -185,6 +189,7 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 		} );
 
 		simplePopup.hide();
+		return "container-" + idSuffix;
 	}
 
 	public void setMenuWidget( IsWidget menuWidget )
@@ -208,7 +213,10 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 				+ '	<img src="images/icons/arrow_refresh.png" id="img-refresh-'
 				+ id + '" width="32" height="32">';
 		content = content + '</span>';
-		content = content + '<span style="clear: both;display: block;">'
+		content = content
+				+ '<span  id="container-'
+				+ id
+				+ '"  style="height: 200px; width: 200px; clear: both; display: block;">'
 				+ textContent + '</span>';
 		content = content + '</li>';
 		gridster.add_widget(content);
