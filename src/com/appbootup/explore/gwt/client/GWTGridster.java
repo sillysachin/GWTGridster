@@ -64,10 +64,12 @@ public class GWTGridster implements EntryPoint
 		sPanelCanvas.setHeight( "100%" );
 		final Gridster gridster = new Gridster()
 		{
+			PolarChart chart;
+
 			@Override
 			protected void onMenuClick( String targetId, final String containerId )
 			{
-				final PolarChart chart = new PolarChart();
+				chart = new PolarChart();
 				chart.setReadyCallback( new IsReadyCallback()
 				{
 					@Override
@@ -76,6 +78,17 @@ public class GWTGridster implements EntryPoint
 						chart.getAmChart().write( containerId );
 					}
 				} );
+			}
+
+			@Override
+			protected void onBlockResize()
+			{
+				chart.getAmChart().invalidateSize();
+			}
+
+			protected void onBlockResizeStop()
+			{
+				chart.getAmChart().invalidateSize();
 			}
 		};
 		gridster.setMenuWidget( vPanelPalette );

@@ -2,6 +2,7 @@ package com.ducksboard.gridster;
 
 import com.google.gwt.core.client.IJavaScriptWrapper;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.DOM;
@@ -79,41 +80,65 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 		jso = makeGridster( id );
 	}
 
-	protected static native GridsterJSO makeGridster( String id )
+	protected native GridsterJSO makeGridster( String id )
 	/*-{
 		var gridster;
+		var gridsterThis = this;
 
-		$wnd.$(function() {
-			gridster = $wnd.$(".gridster ul").gridster({
-				widget_margins : [ 10, 10 ],
-				widget_base_dimensions : [ 140, 140 ],
-				min_cols : 6,
-				helper : 'clone',
-				resize : {
-					enabled : true
-				}
-			}).data('gridster');
-			this.@com.ducksboard.gridster.Gridster::jso = gridster;
-		});
+		$wnd
+				.$(function() {
+					gridster = $wnd
+							.$(".gridster ul")
+							.gridster(
+									{
+										widget_margins : [ 10, 10 ],
+										widget_base_dimensions : [ 140, 140 ],
+										min_cols : 6,
+										helper : 'clone',
+										resize : {
+											enabled : true,
+											stop : function(e, ui, $widget) {
+												gridsterThis.@com.ducksboard.gridster.Gridster::onBlockResizeStop()();
+											},
+											resize : function(e, ui, $widget) {
+												gridsterThis.@com.ducksboard.gridster.Gridster::onBlockResize()();
+											}
+										}
+									}).data('gridster');
+
+					this.@com.ducksboard.gridster.Gridster::jso = gridster;
+				});
 		return gridster;
 	}-*/;
 
-	protected static native GridsterJSO makeGridster( String id, JavaScriptObject configJSO )
+	protected native GridsterJSO makeGridster( String id, JavaScriptObject configJSO )
 	/*-{
 		var gridster;
-		$wnd.$(function() {
-			gridster = $wnd.$(".gridster ul").gridster({
-				widget_margins : [ 10, 10 ],
-				widget_base_dimensions : [ 200, 200 ],
-				min_cols : 6,
-				helper : 'clone',
-				resize : {
-					enabled : true
-				},
-				counter : 0
-			}).data('gridster');
-			this.@com.ducksboard.gridster.Gridster::jso = gridster;
-		});
+		var gridsterThis = this;
+
+		$wnd
+				.$(function() {
+					gridster = $wnd
+							.$(".gridster ul")
+							.gridster(
+									{
+										widget_margins : [ 10, 10 ],
+										widget_base_dimensions : [ 200, 200 ],
+										min_cols : 6,
+										helper : 'clone',
+										resize : {
+											enabled : true,
+											stop : function(e, ui, $widget) {
+												gridsterThis.@com.ducksboard.gridster.Gridster::onBlockResizeStop()();
+											},
+											resize : function(e, ui, $widget) {
+												gridsterThis.@com.ducksboard.gridster.Gridster::onBlockResize()();
+											}
+										},
+										counter : 0
+									}).data('gridster');
+					gridsterThis.@com.ducksboard.gridster.Gridster::jso = gridster;
+				});
 		return gridster;
 	}-*/;
 
@@ -201,7 +226,7 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 		content = content
 				+ '<span  id="container-'
 				+ id
-				+ '"  style="height: 200px; width: 200px; clear: both; display: block;">'
+				+ '"  style="height: 100%; width: 100%; clear: both; display: block;">'
 				+ textContent + '</span>';
 		content = content + '</li>';
 		gridster.add_widget(content);
@@ -231,5 +256,22 @@ public class Gridster extends ResizeComposite implements IJavaScriptWrapper<Grid
 
 	protected void onMenuClick( final String targetId, final String containerId )
 	{
+	}
+
+	protected void onBlockResize()
+	{
+		GWT.log( "onBlockResize" );
+	}
+
+	protected void onBlockResizeStop()
+	{
+		GWT.log( "onBlockResizeStop" );
+	}
+
+	@Override
+	public void onResize()
+	{
+		super.onResize();
+		GWT.log( "onResize" );
 	}
 }
